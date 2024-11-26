@@ -1,0 +1,123 @@
+{%- liquid
+  assign buybutton_setting = false
+  assign gift_card_recipient_feature_active = false
+  assign show_quantity = show_quantity | default: block.settings.show_quantity | default: false
+
+  assign button_text = 'products.product.add_to_cart' | t
+  if is_preorder
+    assign button_text =  'products.product.pre_order' | t
+  endif
+
+  unless current_variant.available
+    assign button_text =  'products.product.sold_out' | t
+  endunless
+
+  if block.settings.show_gift_card_recipient and product.gift_card?
+    assign gift_card_recipient_feature_active = true
+  endif
+
+  if block.settings.show_payment_button and gift_card_recipient_feature_active == false
+    assign buybutton_setting = true
+  endif
+
+  comment
+    Override buy button setting if there are selling plan groups
+  endcomment
+  if product.selling_plan_groups.size > 0
+    assign buybutton_setting = false
+  endif
+
+  assign btn_atc_class = 'btn--solid'
+  if buybutton_setting
+    assign btn_atc_class = 'btn--outline'
+  endif
+-%}
+
+{%- capture quantity_selector -%}
+  {%- if show_quantity -%}
+    <div class="select-popout" data-popout data-popout-prevent="true">
+      <button type="button"
+        class="select-popout__toggle"
+        aria-expanded="false"
+        aria-controls="{{ unique }}-select-quantity"
+        aria-labelledby="{{ unique }}-select-quantity-label"
+        data-popout-toggle>
+        <span data-popout-toggle-text>1</span>
+        {%- render 'icon-nav-arrow-down' -%}
+      </button>
+
+      <ul id="{{ unique }}-select-quantity" class="select-popout__list" data-popout-list>
+        {%- for idx in (1..10) -%}
+          <li class="select-popout__item{% if forloop.index == 1 %} is-active{% endif %}">
+            <a class="select-popout__option" href="#" {% if forloop.index == 1 %}aria-current="true"{% endif %} data-value="{{ forloop.index }}" data-popout-option>
+              <span>
+                {{ forloop.index }} {% if forloop.last %}+{% endif %}
+              </span>
+            </a>
+          </li>
+        {%- endfor -%}
+      </ul>
+
+      <div class="quantity-selector" data-quantity-holder>
+        <label for="product-quantity-buttons-{{ section_id }}" class="label-hidden">{{ 'products.product.quantity' | t }}</label>
+
+        <button type="button" class="quantity__minus" data-quantity-minus data-quantity-button tabindex="0" title="{{ 'cart.general.decrease_quantity_label' | t }} - {{ product.title | strip_html }}">{%- render 'icon-minus' -%}</button>
+
+        <input id="product-quantity-buttons-{{ section_id }}" data-popout-input type="number" class="quantity__input" value="1" min="1" aria-label="quantity" autocomplete="off" name="quantity" data-quantity-field title="{{ 'cart.general.quantity_field_label' | t }} - {{ product.title | strip_html }}" pattern="[0-9]*">
+
+        <button type="button" class="quantity__plus" data-quantity-plus data-quantity-button tabindex="0" title="{{ 'cart.general.increase_quantity_label' | t }} - {{ product.title | strip_html }}">{% render 'icon-plus' %}</button>
+      </div>
+    </div>
+  {%- else -%}
+    <input type="hidden" name="quantity" value="1">
+  {%- endif -%}
+{%- endcapture -%}
+
+<div class="product__block product__block--buttons"
+  {{ block_style }}
+  {{ block.shopify_attributes }}>
+  <product-form>
+    {%- form 'product', product, id: product_form_id, class: 'product-form', data-product-form: '', data-hide-errors: gift_card_recipient_feature_active -%}
+      {%- if gift_card_recipient_feature_active -%}
+        {%- render 'gift-card-recipient-form', product: product, form: form, section: section -%}
+      {%- endif -%}
+
+      <div class="product__submit{% if buybutton_setting %} product__submit--spb{% endif %}"
+        {% if animation_name %}
+          data-animation="{{ animation_name }}"
+          data-animation-duration="{{ animation_duration }}"
+          data-animation-delay="{{ animation_delay }}"
+        {% endif %}>
+        <div class="product__form__errors" data-cart-errors-container></div>
+
+        <div class="product__submit__buttons{% if buybutton_setting and show_quantity == false %} product__submit__buttons--inline{% endif %}">
+          <div class="product__submit__item{% if show_quantity %} product__submit__item--inline{% endif %}">
+            {{ quantity_selector }}
+
+            <button
+              type="submit"
+              name="add"
+              class="btn btn--primary {{ btn_atc_class }}"
+              data-add-to-cart
+              {% unless current_variant.available %}disabled="disabled"{% endunless %}>
+              <span class="btn__text" data-add-to-cart-text>{{ button_text }}</span>
+              <span class="btn__added">&nbsp;</span>
+
+              <span class="btn__loader">
+                <svg height="18" width="18" class=" svg-loader">
+                  <circle r="7" cx="9" cy="9" />
+                  <circle stroke-dasharray="87.96459430051421 87.96459430051421" r="7" cx="9" cy="9" />
+                </svg>
+              </span>
+            </button>
+          </div>
+          {%- if buybutton_setting -%}
+            <div class="product__submit__item">
+              {{ form | payment_button }}
+            </div>
+          {%- endif -%}
+        </div>
+      </div>
+    {%- endform -%}
+  </product-form>
+</div>

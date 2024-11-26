@@ -1,0 +1,518 @@
+{%- liquid
+  assign bg_color = section.settings.bg_color
+  assign text_color = section.settings.color
+  assign border_color = section.settings.border_color
+-%}
+
+{%- if section.blocks.size > 0 -%}
+  {%- style -%}
+    #Faq--{{ section.id }} {
+      --PT: {{ section.settings.padding_top }}px;
+      --PB: {{ section.settings.padding_bottom }}px;
+
+      {%- unless bg_color == 'rgba(0,0,0,0)' or bg_color == blank -%}
+        --bg: {{ bg_color }};
+      {%- endunless -%}
+
+      {%- unless text_color == 'rgba(0,0,0,0)' or text_color == blank -%}
+        --text: {{ text_color }};
+        --text-dark: {{ text_color | color_saturate: 10 | color_darken: 15 }};
+        --text-a35: {{ text_color | color_modify: 'alpha', 0.35 }};
+        --text-a70: {{ text_color | color_modify: 'alpha', 0.70 }};
+        --text-a75: {{ text_color | color_modify: 'alpha', 0.75 }};
+      {%- endunless -%}
+
+      {%- unless border_color == 'rgba(0,0,0,0)' or border_color == blank -%}
+        --border: {{ border_color }};
+      {%- endunless -%}
+    }
+  {%- endstyle -%}
+
+  <section id="Faq--{{ section.id }}"
+    class="accordion-section section-padding"
+    data-section-id="{{ section.id }}"
+    data-section-type="faq">
+    <div class="{{ section.settings.width }}">
+      {%- if section.settings.title != blank -%}
+        <collapsible-elements>
+          <details class="accordion" data-collapsible>
+            {%- if section.settings.title != blank -%}
+              {%- assign font_size_class = section.settings.heading_size | prepend: 'heading-size-' -%}
+              {%- assign mobile_font_size_class = section.settings.mobile_heading_size | prepend: 'mobile-heading-size-' -%}
+              <summary class="accordion__title h6 {{ font_size_class }} {{ mobile_font_size_class }}" data-collapsible-trigger>
+                {{ section.settings.title }}
+
+                {%- render 'icon-plus' -%}
+                {%- render 'icon-minus' -%}
+              </summary>
+            {%- endif -%}
+
+            <div class="accordion__body rte" data-collapsible-body>
+              <div class="accordion__content" data-collapsible-content>
+                <div class="faq-list faq-list--{{ section.blocks.size }}">
+                  {%- for block in section.blocks -%}
+                    {%- capture text_content -%}
+                      <div class="faq-list__item-description">
+                        {%- if block.settings.title != blank -%}
+                          {%- assign font_size_class = block.settings.heading_size | prepend: 'heading-size-' -%}
+                          {%- assign mobile_font_size_class = block.settings.mobile_heading_size | prepend: 'mobile-heading-size-' -%}
+
+                          <h3 class="faq-list__item-title {{ font_size_class }} {{ mobile_font_size_class }}">
+                            {{ block.settings.title }}
+                          </h3>
+                        {%- endif -%}
+
+                        <div class="faq-list__item-content">
+                          {{ block.settings.text }}
+                        </div>
+                      </div>
+                    {%- endcapture -%}
+
+                    {%- case block.type -%}
+                      {%- when '@app' -%}
+                        <div class="faq-list__item">
+                          {%- render block -%}
+                        </div>
+
+                      {%- when 'text' -%}
+                        {%- assign font_size_class_text_block = block.settings.text_size | prepend: 'body-size-' -%}
+                        {%- assign mobile_font_size_class_text_block = block.settings.mobile_text_size | prepend: 'mobile-body-size-' -%}
+                        <div class="faq-list__item {{ font_size_class_text_block }} {{ mobile_font_size_class_text_block }}" {{ block.shopify_attributes }}>
+
+                          {{ text_content }}
+                        </div>
+                      {%- when 'icon' -%}
+                        <div class="faq-list__item" {{ block.shopify_attributes }}>
+                          <div class="faq-list__item-icon">
+                            {%- liquid
+                              assign icon_size = block.settings.icon_size
+                              assign icon_color = block.settings.icon_color
+                              capture icon_style
+                                echo 'style="'
+                                echo '--icon-size: ' | append: icon_size | append: 'px;'
+                                if icon_color != blank and icon_color != 'rgba(0,0,0,0)'
+                                  echo ' --text: ' | append: icon_color | append: ';'
+                                endif
+                                echo '"'
+                              endcapture
+                            -%}
+
+                            <div class="icon__animated icon__animated--{{ block.id }}" {{ icon_style }}>
+                              {%- render 'animated-icon', filename: block.settings.icon_name -%}
+                            </div>
+                          </div>
+                          {{ text_content }}
+                        </div>
+                      {%- when 'image' -%}
+                        {%- assign font_size_class = block.settings.text_size | prepend: 'body-size-' -%}
+                        {%- assign mobile_font_size_class = block.settings.mobile_text_size | prepend: 'mobile-body-size-' -%}
+                        <div class="faq-list__item {{ font_size_class }} {{ mobile_font_size_class }}" {{ block.shopify_attributes }}>
+                          <div class="faq-list__item-image">
+                            {%- assign aspect_ratio = 1 | divided_by: block.settings.aspect_ratio -%}
+                            {%- render 'image', image: block.settings.image, aspect_ratio: aspect_ratio -%}
+                          </div>
+                          {{ text_content }}
+                        </div>
+                      {%- when 'code' -%}
+                        <div class="faq-list__item" {{ block.shopify_attributes }}>
+                          {{ block.settings.code }}
+                        </div>
+                      {%- when 'contact-form' -%}
+                        <div class="faq-list__item faq-list__item--form" {{ block.shopify_attributes }}>
+                          {%- assign section_block_id = section.id | append: '-' | append: block.id -%}
+                          {%- assign form_id = 'contact-us-page-' | append: section_block_id -%}
+                          {%- assign field_name = 'contact.form.name' | t -%}
+                          {%- assign field_email = 'contact.form.email' | t -%}
+                          {%- assign field_message = 'contact.form.message' | t -%}
+                          {%- form 'contact', id: form_id -%}
+                            {%- if form.posted_successfully? -%}
+                              <p class="form-success">
+                                {{ 'contact.form.post_success' | t }}
+                              </p>
+                            {%- endif -%}
+
+                            {{ form.errors | default_errors }}
+
+                            <div class="custom-form__block">
+                              <label for="Form-{{ section.id }}-{{ forloop.index0 }}" class="visually-hidden">{{ field_name }}</label>
+                              <input type="text" class="contactFormText field" id="Form-{{ section_block_id }}-{{ forloop.index0 }}" name="contact[{{ field_name | handleize }}]" placeholder="{{ field_name }}" autocapitalize="words" value="" required>
+                            </div>
+
+                            <div class="custom-form__block">
+                              <label for="contactFormEmail" class="visually-hidden">{{ field_email }}</label>
+                              <input type="email" id="{{ section_block_id }}-contactFormEmail" class="contactFormEmail field" name="contact[email]" placeholder="{{ field_email }}" autocorrect="off" autocapitalize="off" required>
+                            </div>
+
+                            <div class="custom-form__block">
+                              <label for="ContactFormMessage" class="visually-hidden">{{ field_message }}</label>
+                              <textarea rows="10" id="{{ section_block_id }}-ContactFormMessage" class="contactFormMessage field" name="contact[body]" placeholder="{{ field_message }}"></textarea>
+                            </div>
+
+                            <div class="custom-form__block">
+                              <input type="submit" class="btn btn--black btn--solid btn--full" value="{{ 'contact.form.send' | t }}">
+                            </div>
+
+                            {%- if block.settings.terms -%}
+                              <div class="form__legal">
+                                {{ 'shopify.online_store.spam_detection.disclaimer_html' | t }}
+                              </div>
+                            {%- endif -%}
+                          {%- endform -%}
+                        </div>
+                      {%- else -%}
+                    {%- endcase -%}
+                  {%- endfor -%}
+                </div>
+              </div>
+            </div>
+          </details>
+        </collapsible-elements>
+      {%- endif -%}
+    </div>
+  </section>
+{%- else -%}
+  {%- render 'no-blocks' -%}
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Accordion",
+  "class": "accordions-holder",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "info": "Section will not be visible if left empty.",
+      "default": "FAQ"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "label": "Heading size",
+      "min": 1,
+      "max": 15,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "mobile_heading_size",
+      "label": "Mobile heading size",
+      "min": 1,
+      "max": 15,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background"
+    },
+    {
+      "type": "color",
+      "id": "color",
+      "label": "Text"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border"
+    },
+    {
+      "type": "select",
+      "id": "width",
+      "label": "Width",
+      "default": "wrapper",
+      "options": [
+        {"value": "wrapper", "label": "Normal"},
+        {"value": "wrapper--narrow", "label": "Narrow"}
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Section padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 0
+    }
+  ],
+  "blocks": [
+    {
+      "type": "@app"
+    },
+    {
+      "name": "Text column",
+      "type": "text",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "Frequently asked question"
+        },
+        {
+          "type": "range",
+          "id": "heading_size",
+          "label": "Heading size",
+          "min": 1,
+          "max": 15,
+          "step": 1,
+          "default": 4
+        },
+        {
+          "type": "range",
+          "id": "mobile_heading_size",
+          "label": "Mobile heading size",
+          "min": 1,
+          "max": 15,
+          "step": 1,
+          "default": 4
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "<p>Use this to answer some common questions you hear from your customers. You could discuss product details, size fit, shipping policies, or anything you think would help merchants make an informed decision about your products. This section will appear across all products.</p>"
+        },
+        {
+          "type": "range",
+          "id": "text_size",
+          "label": "Text size",
+          "min": 1,
+          "max": 15,
+          "step": 1,
+          "default": 3
+        },
+        {
+          "type": "range",
+          "id": "mobile_text_size",
+          "label": "Mobile text size",
+          "min": 1,
+          "max": 15,
+          "step": 1,
+          "default": 3
+        }
+      ]
+    },
+    {
+      "name": "Image column",
+      "type": "image",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "Image heading"
+        },
+        {
+          "type": "range",
+          "id": "heading_size",
+          "label": "Heading size",
+          "min": 1,
+          "max": 15,
+          "step": 1,
+          "default": 4
+        },
+        {
+          "type": "range",
+          "id": "mobile_heading_size",
+          "label": "Mobile heading size",
+          "min": 1,
+          "max": 15,
+          "step": 1,
+          "default": 4
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "<p>Use this to answer some common questions you hear from your customers. You could discuss product details, size fit, shipping policies, or anything you think would help merchants make an informed decision about your products. This section will appear across all products.</p>"
+        },
+        {
+          "type": "range",
+          "id": "text_size",
+          "label": "Text size",
+          "min": 1,
+          "max": 15,
+          "step": 1,
+          "default": 3
+        },
+        {
+          "type": "range",
+          "id": "mobile_text_size",
+          "label": "Mobile text size",
+          "min": 1,
+          "max": 15,
+          "step": 1,
+          "default": 3
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "range",
+          "id": "aspect_ratio",
+          "min": 0.3,
+          "max": 1.5,
+          "step": 0.1,
+          "unit": ":1",
+          "label": "Photo aspect ratio",
+          "info": "Wide to tall",
+          "default": 0.6
+        }
+      ]
+    },
+    {
+      "type": "icon",
+      "name": "Icon column",
+      "settings": [
+      {
+          "type": "select",
+          "id": "icon_name",
+          "label": "Icon",
+          "default": "icon-award",
+          "options": [
+            { "label": "Award", "value": "icon-award" },
+            { "label": "Box", "value": "icon-box" },
+            { "label": "Chat", "value": "icon-chat" },
+            { "label": "Cloud", "value": "icon-cloud" },
+            { "label": "Diameter", "value": "icon-diameter" },
+            { "label": "Discount", "value": "icon-discount" },
+            { "label": "Donation", "value": "icon-donation" },
+            { "label": "Droplet", "value": "icon-droplet" },
+            { "label": "Info", "value": "icon-info-empty" },
+            { "label": "Email", "value": "icon-email" },
+            { "label": "Fast shipment", "value": "icon-fast-shipment" },
+            { "label": "Flare", "value": "icon-flare" },
+            { "label": "Flower", "value": "icon-flower" },
+            { "label": "Gift", "value": "icon-gift" },
+            { "label": "Green shipment", "value": "icon-green-shipment" },
+            { "label": "Heart", "value": "icon-heart" },
+            { "label": "Leaf", "value": "icon-leaf" },
+            { "label": "Lightening", "value": "icon-lightening" },
+            { "label": "Location", "value": "icon-location" },
+            { "label": "Mail", "value": "icon-mail" },
+            { "label": "Notes", "value": "icon-notes" },
+            { "label": "Pants", "value": "icon-pants" },
+            { "label": "Peace", "value": "icon-peace" },
+            { "label": "Pin", "value": "icon-pin" },
+            { "label": "Planet", "value": "icon-planet" },
+            { "label": "Phone", "value": "icon-phone" },
+            { "label": "Recycle", "value": "icon-recycle" },
+            { "label": "Ruler", "value": "icon-ruler" },
+            { "label": "Shield", "value": "icon-shield" },
+            { "label": "Smile", "value": "icon-smile" },
+            { "label": "Star", "value": "icon-star" },
+            { "label": "Tree", "value": "icon-tree" },
+            { "label": "Trophy", "value": "icon-trophy" },
+            { "label": "Truck", "value": "icon-truck" },
+            { "label": "Vegan", "value": "icon-vegan" },
+            { "label": "Wash", "value": "icon-wash" },
+            { "label": "Washing machine", "value": "icon-washing-machine" }
+          ]
+        },
+        {
+          "type": "range",
+          "id": "icon_size",
+          "label": "Size",
+          "unit": "px",
+          "min": 20,
+          "max": 80,
+          "step": 5,
+          "default": 20
+        },
+        {
+          "type": "color",
+          "id": "icon_color",
+          "label": "Icon color",
+          "default": "#545454"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "Icon heading"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "<p>Use this to answer some common questions you hear from your customers. You could discuss product details, size fit, shipping policies, or anything you think would help merchants make an informed decision about your products. This section will appear across all products.</p>"
+        }
+      ]
+    },
+    {
+      "type": "code",
+      "name": "Custom code",
+      "settings": [
+        {
+          "type": "liquid",
+          "id": "code",
+          "label": "Custom code",
+          "default": "<p>Once you write some custom code, it will render right here.</p>"
+        }
+      ]
+    },
+    {
+      "type": "contact-form",
+      "name": "Contact form",
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "terms",
+          "label": "Show reCAPTCHA terms",
+          "default": true,
+          "info": "Recommended if your online store preferences have spam protection enabled."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Accordion",
+      "category": "Text",
+      "blocks": [
+        {
+          "type": "text"
+        },
+        {
+          "type": "text"
+        },
+        {
+          "type": "text"
+        },
+        {
+          "type": "text"
+        }
+      ]
+    }
+  ],
+  "disabled_on": {
+    "groups": ["header", "aside", "custom.pre_footer", "footer"]
+  }
+}
+{% endschema %}

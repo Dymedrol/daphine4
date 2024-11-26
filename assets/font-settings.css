@@ -1,0 +1,77 @@
+@font-face {
+  font-family: "ITC Galliard";
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+  src: url("//www.shop-daphine.com/cdn/fonts/itc_galliard/itcgalliard_i4.c863574e609471613eaee3981fdc901856754818.woff2?h1=ZGFwaGluZS5jby51aw&h2=c2hvcC1kYXBoaW5lLmFjY291bnQubXlzaG9waWZ5LmNvbQ&h3=c2hvcC1kYXBoaW5lLmNvbQ&hmac=eb11bfef213c5168010a0ad1b9eecf26d6b97e308463dd9d580f0a227577ab5f") format("woff2"),
+       url("//www.shop-daphine.com/cdn/fonts/itc_galliard/itcgalliard_i4.82dab184e82d2f9306499d9f8ce465a12c424aef.woff?h1=ZGFwaGluZS5jby51aw&h2=c2hvcC1kYXBoaW5lLmFjY291bnQubXlzaG9waWZ5LmNvbQ&h3=c2hvcC1kYXBoaW5lLmNvbQ&hmac=60360f17fec5d882956c3b01120bd909b3923ded81c297ec1e1b9696b13c298b") format("woff");
+}
+
+@font-face {
+  font-family: Montserrat;
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+  src: url("//www.shop-daphine.com/cdn/fonts/montserrat/montserrat_n5.e72d00d31ae5399d260a80ec70322c62c1819762.woff2?h1=ZGFwaGluZS5jby51aw&h2=c2hvcC1kYXBoaW5lLmFjY291bnQubXlzaG9waWZ5LmNvbQ&h3=c2hvcC1kYXBoaW5lLmNvbQ&hmac=84e058e2cacccc86f334e51f3a1a66f052d1f61b9b0ee4c57368698d1b30afa4") format("woff2"),
+       url("//www.shop-daphine.com/cdn/fonts/montserrat/montserrat_n5.18a018b6c83e89030c5d70a6d4c02c969f228500.woff?h1=ZGFwaGluZS5jby51aw&h2=c2hvcC1kYXBoaW5lLmFjY291bnQubXlzaG9waWZ5LmNvbQ&h3=c2hvcC1kYXBoaW5lLmNvbQ&hmac=61123a24a6448674a5a3bd8507c4810dea735b51569a65c3c30d33bff5d82b03") format("woff");
+}
+
+@font-face {
+  font-family: Montserrat;
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+  src: url("//www.shop-daphine.com/cdn/fonts/montserrat/montserrat_n5.e72d00d31ae5399d260a80ec70322c62c1819762.woff2?h1=ZGFwaGluZS5jby51aw&h2=c2hvcC1kYXBoaW5lLmFjY291bnQubXlzaG9waWZ5LmNvbQ&h3=c2hvcC1kYXBoaW5lLmNvbQ&hmac=84e058e2cacccc86f334e51f3a1a66f052d1f61b9b0ee4c57368698d1b30afa4") format("woff2"),
+       url("//www.shop-daphine.com/cdn/fonts/montserrat/montserrat_n5.18a018b6c83e89030c5d70a6d4c02c969f228500.woff?h1=ZGFwaGluZS5jby51aw&h2=c2hvcC1kYXBoaW5lLmFjY291bnQubXlzaG9waWZ5LmNvbQ&h3=c2hvcC1kYXBoaW5lLmNvbQ&hmac=61123a24a6448674a5a3bd8507c4810dea735b51569a65c3c30d33bff5d82b03") format("woff");
+}
+
+
+
+  @font-face {
+  font-family: "ITC Galliard";
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+  src: url("//www.shop-daphine.com/cdn/fonts/itc_galliard/itcgalliard_i7.d79a27445e78b977891490bfa64e4d56626dca3f.woff2?h1=ZGFwaGluZS5jby51aw&h2=c2hvcC1kYXBoaW5lLmFjY291bnQubXlzaG9waWZ5LmNvbQ&h3=c2hvcC1kYXBoaW5lLmNvbQ&hmac=bd57c0f0aaa66bde33077e87548bd7e8fa9310108b929fd98d1c1796f8b78407") format("woff2"),
+       url("//www.shop-daphine.com/cdn/fonts/itc_galliard/itcgalliard_i7.ccdd98ec6098b362f74517e90dd262006ca26ac4.woff?h1=ZGFwaGluZS5jby51aw&h2=c2hvcC1kYXBoaW5lLmFjY291bnQubXlzaG9waWZ5LmNvbQ&h3=c2hvcC1kYXBoaW5lLmNvbQ&hmac=19e68d2f8d6bec81af640343c6f1be7043ffb5309ae5ccf23dd6fa9dcc6a183d") format("woff");
+}
+
+
+
+
+  @font-face {
+  font-family: Montserrat;
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+  src: url("//www.shop-daphine.com/cdn/fonts/montserrat/montserrat_n6.7a3c341961dc23aaabcc116124b80f2a7abec1a2.woff2?h1=ZGFwaGluZS5jby51aw&h2=c2hvcC1kYXBoaW5lLmFjY291bnQubXlzaG9waWZ5LmNvbQ&h3=c2hvcC1kYXBoaW5lLmNvbQ&hmac=773d5d4353cdfe54a9955a0c8d6bfd569db27c923732a93f0e33b5a7d8ae8fbe") format("woff2"),
+       url("//www.shop-daphine.com/cdn/fonts/montserrat/montserrat_n6.2c97c1a692c63ad09ab0635cb73b1939c5f417c0.woff?h1=ZGFwaGluZS5jby51aw&h2=c2hvcC1kYXBoaW5lLmFjY291bnQubXlzaG9waWZ5LmNvbQ&h3=c2hvcC1kYXBoaW5lLmNvbQ&hmac=500ee610b22253cbe5af875d7b9e403b38083bc4bdfb4e28a1c8df929935e05b") format("woff");
+}
+
+
+
+
+
+
+
+  @font-face {
+  font-family: Montserrat;
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+  src: url("//www.shop-daphine.com/cdn/fonts/montserrat/montserrat_i5.3a4750a300f30824a43384268712b76e0a04be8c.woff2?h1=ZGFwaGluZS5jby51aw&h2=c2hvcC1kYXBoaW5lLmFjY291bnQubXlzaG9waWZ5LmNvbQ&h3=c2hvcC1kYXBoaW5lLmNvbQ&hmac=5379f0adee44dd6476d20856c5089eb42d5cf21b05ca8cd2014ad99144bd27f5") format("woff2"),
+       url("//www.shop-daphine.com/cdn/fonts/montserrat/montserrat_i5.3c586d8884de1ac5627138711567f5b454adbef8.woff?h1=ZGFwaGluZS5jby51aw&h2=c2hvcC1kYXBoaW5lLmFjY291bnQubXlzaG9waWZ5LmNvbQ&h3=c2hvcC1kYXBoaW5lLmNvbQ&hmac=8b2e270600ce7ccbd7a36c75415bd74f2126dd2f0e4d628791c963c817a7ad0b") format("woff");
+}
+
+
+
+
+  @font-face {
+  font-family: Montserrat;
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
+  src: url("//www.shop-daphine.com/cdn/fonts/montserrat/montserrat_i6.bb32b9769003f43740e1d34d4950111dc499f6a3.woff2?h1=ZGFwaGluZS5jby51aw&h2=c2hvcC1kYXBoaW5lLmFjY291bnQubXlzaG9waWZ5LmNvbQ&h3=c2hvcC1kYXBoaW5lLmNvbQ&hmac=b5ad30240f634794bf3fe4614b0465910e16d6e771adddd070e0f451dee77003") format("woff2"),
+       url("//www.shop-daphine.com/cdn/fonts/montserrat/montserrat_i6.03e5487c9d0e38a8b7842611c321007444720c45.woff?h1=ZGFwaGluZS5jby51aw&h2=c2hvcC1kYXBoaW5lLmFjY291bnQubXlzaG9waWZ5LmNvbQ&h3=c2hvcC1kYXBoaW5lLmNvbQ&hmac=a928ee0dab06f6dd76d1116d74298139ecd207bc26b20db836fb2ed41eea68da") format("woff");
+}
+

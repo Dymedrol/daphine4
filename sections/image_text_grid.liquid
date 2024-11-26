@@ -1,0 +1,103 @@
+<style>
+  #shopify-section-{{section.id}} .grid-flex {display: flex;flex-wrap: wrap;}
+  #shopify-section-{{section.id}} .img {padding-bottom: 85%;background-size: cover;background-position: center center;background-repeat: no-repeat;}
+
+  #shopify-section-{{section.id}} .text {height: 100%;display: flex;flex-direction: column;justify-content: center;align-items: center;padding: 1em;}
+  #shopify-section-{{section.id}} .text h3 {font-size:32px}
+  #shopify-section-{{section.id}} .text p {font-size: 16px;max-width:415px}
+
+  #shopify-section-{{section.id}} .grid-flex .one-third.small--one-whole
+  {
+      width: 33.33%;
+      margin-bottom: -5px;
+  }
+
+  @media only screen and (max-width: 749px)
+  {
+      #shopify-section-{{section.id}} .grid-flex .one-third.small--one-whole
+      {
+          width: 100%;
+          margin-bottom: 0px;
+      }
+  }
+  
+    @media screen and (max-width: 580px) {
+      #shopify-section-{{section.id}} .text h3 {font-size:1.625rem;}
+      #shopify-section-{{section.id}} .text p {font-size: 0.875rem;    line-height: 30px;}
+    }
+    
+  </style>
+  
+  <div class="grid-flex">
+    {% for block in section.blocks %}
+      <div class="one-third small--one-whole">
+        {% if block.type == 'image' %}
+          <div class="hccustomimahe">
+              <img src="{{ block.settings.image | img_url: 'master' }}" style="width: 100%;">
+          </div>
+        
+        {% else %}
+            <div class="text text-center ">
+              <h3 style="font-size: {{ block.settings.title_font }}px;">{{ block.settings.title }}</h3>
+              <p style="font-size: {{ block.settings.text_font }}px;">{{ block.settings.text }}</p>
+            </div>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+
+  {% schema %}
+  {
+      "name": "Image and Text grid",
+      "presets": [
+          { 
+            "name": "Image and Text grid",
+            "category": "Page"
+          }
+      ],
+      "settings": [
+        
+      ],
+      "blocks": [
+        {
+          "type": "image",
+          "name": "Image",
+          "settings": [
+            {
+              "type": "image_picker",
+              "id": "image",
+              "label": "Image"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "name": "Text",
+          "settings": [
+            {
+              "type": "text",
+              "id": "title",
+              "label": "Title"
+            },
+            {
+              "type": "text",
+              "id": "title_font",
+              "label": "Title Font Size",
+              "info": "This field accept the va;ue by default in px."
+            },
+            {
+              "type": "textarea",
+              "id": "text",
+              "label": "Text"
+            },
+            {
+              "type": "text",
+              "id": "text_font",
+              "label": "Text Font Size",
+              "info": "This field accept the va;ue by default in px."
+            }
+          ]
+        }
+      ]
+  }
+{% endschema %}  

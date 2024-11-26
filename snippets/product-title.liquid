@@ -1,0 +1,59 @@
+<div class="product__block product__head"
+  {{ block_style }}
+  {% if animation_name %}
+    data-animation="{{ animation_name }}"
+    data-animation-duration="{{ animation_duration }}"
+    data-animation-delay="{{ animation_delay }}"
+  {% endif %}>
+  {%- case block.settings.subheading_option -%}
+    {%- when 'vendor' -%}
+      {%- if product.vendor -%}
+        <nav class="breadcrumbs breadcrumbs--no-padding product__breadcrumbs">
+          <a href="{{ product.vendor | url_for_vendor }}">{{ product.vendor }}</a>
+        </nav>
+      {%- endif -%}
+    {%- when 'collection' -%}
+      {%- if collection or product.collections.size > 0 -%}
+        {%- assign current_collection = collection | default: product.collections[0] -%}
+
+        <nav class="breadcrumbs breadcrumbs--no-padding product__breadcrumbs">
+          <a href="{{ current_collection.url }}">{{ current_collection.title }}</a>
+        </nav>
+      {%- endif -%}
+    {%- when 'breadcrumb'  -%}
+      {% render 'breadcrumbs' breadcrumbs_modifier: 'breadcrumbs--no-padding product__breadcrumbs' %}
+  {%- endcase -%}
+
+  <div class="product__title__wrapper" data-zoom-caption {{ block.shopify_attributes }}>
+    <h1 class="product__title">
+      {%- unless is_title_linked -%}
+        {{ product.title | strip_html }}
+      {%- else -%}
+        <a href="{{ product.url }}">{{ product.title | strip_html }}</a>
+      {%- endunless -%}
+    </h1>
+
+    {%- if block.settings.show_rating and product.metafields.reviews.rating.value != blank -%}
+      <div class="product__badge">
+        <button type="button" class="product__badge-link" data-scroll-to="#reviews-{{ product.id }}">
+          <div class="rating-container product__rating">
+            {%- if block.settings.enable_star_rating -%}
+              <div class="rating" role="img" aria-label="{{ 'general.accessibility.star_reviews_info' | t: rating_value: product.metafields.reviews.rating.value, rating_max: product.metafields.reviews.rating.value.scale_max }}">
+                {% render 'icon-star' %}
+              </div>
+            {%- endif -%}
+            <p class="rating-text caption">
+              <span aria-hidden="true">{{ product.metafields.reviews.rating.value.rating | round: 1 }}</span>
+            </p>
+            {%- if block.settings.show_rating_count -%}
+              <p class="rating-count caption">
+                <span aria-hidden="true">({{ product.metafields.reviews.rating_count }})</span>
+                <span class="visually-hidden">{{ product.metafields.reviews.rating_count }} {{ "general.accessibility.total_reviews" | t }}</span>
+              </p>
+            {%- endif -%}
+          </div>
+        </button>
+      </div>
+    {%- endif -%}
+  </div>
+</div>

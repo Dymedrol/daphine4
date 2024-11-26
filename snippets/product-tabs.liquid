@@ -1,0 +1,211 @@
+<!-- /snippets/product-tabs.liquid -->
+{% comment %}
+    Renders product tabs
+
+    Accepts:
+    - section: {Object} Current section (required)
+    - product: {Object} Current product (optional)
+
+    Usage:
+    {% render 'product-tabs', section: section, product: product  %}
+{% endcomment %}
+
+{%- liquid
+  assign product_description_content = product.description | strip
+  assign truncate_string = 'products.general.read_more' | t
+  assign show_more_button = block.settings.show_read_more
+
+  assign truncated_holder = ''
+  if show_more_button
+    assign truncated_holder = 'data-truncated-holder'
+  endif
+
+  assign truncate_html = '<button type="button" class="caps--link" data-truncated-button>' | append: truncate_string | append: '</button>'
+
+  if product == nil
+    assign product_description_content = 'home_page.onboarding.no_description' | t
+  endif
+-%}
+
+{%- if block.settings.style == 'tabs' -%}
+  {%- assign tab_links_html = '' -%}
+  {%- assign tab_contents_html = '' -%}
+  {%- assign count = 0 -%}
+
+  {%- if product_description_content != blank -%}
+    {%- capture tab_links_html -%}
+      <li class="tab-link tab-link-0 current" data-block-id="{{ section.id | append: '-0' }}" data-tab="0" tabindex="0" data-attributes-placeholder>
+        <span>{{ 'products.general.description' | t }}</span>
+      </li>
+    {%- endcapture -%}
+
+    {%- capture tab_contents_html -%}
+      <div class="tab-content tab-content-0 current rte">
+        <div class="tab-content__holder tab-content__holder--truncate" {{ truncated_holder }}>
+          <div class="tab-content__inner">
+            <div class="tab-content__entry" data-truncated-content="tab-content__entry--truncate">
+              {{ product_description_content }}
+            </div>
+          </div>
+
+          {%- if show_more_button -%}
+            <div class="tab-content__actions">
+              {{ truncate_html }}
+            </div>
+          {%- endif -%}
+        </div>
+      </div>
+    {%- endcapture -%}
+
+    {%- assign count = 1 -%}
+  {%- endif -%}
+
+  {%- for i in (1..5) -%}
+    {%- assign title = 'title_' | append: forloop.index -%}
+    {%- assign title = block.settings[title] -%}
+
+    {%- assign content = 'raw_content_' | append: forloop.index -%}
+    {%- assign content = block.settings[content] -%}
+
+    {%- if title != '' and content != '' -%}
+      {%- capture tab_links_html -%}
+        {{ tab_links_html }}
+
+        <li class="tab-link tab-link-{{ count }}{% if count == 0 %} current{% endif %}" data-tab="{{ count }}" data-block-id="{{ block.id }}" tabindex="0" {{ block.shopify_attributes }}>
+          <span>{{ title }}</span>
+        </li>
+      {%- endcapture -%}
+
+      <!-- HC - Updated changes for the Details tab - 18 Jul '23 -->
+      {% if title == 'DETAILS' %}
+          {%- capture tab_contents_html -%}
+            {{ tab_contents_html }}
+            <div class="tab-content tab-content-{{ count }}{% if count == 0 %} current{% endif %} rte">
+                {% for item in product.metafields.accordion limit:3 %}
+                    {% assign title = item[0] | split:'_'%}   
+                    {% assign newtitle = title[1] | handle %}
+                    {% if newtitle == 'details' %}
+                      {{ item[1] }}
+                    {% endif %}
+                {% endfor %}
+            </div>
+          {%- endcapture -%}
+      {% elsif title == 'SHIPPING' %}
+        {%- capture tab_contents_html -%}
+          {{ tab_contents_html }}
+          <div class="tab-content tab-content-{{ count }}{% if count == 0 %} current{% endif %} rte">
+            {% for item in product.metafields.accordion limit:3 %}
+              {% assign title = item[0] | split:'_'%}
+              {% assign newtitle = title[1] | handle %}
+              {% if newtitle == 'shipping' %}
+                {{ item[1] }}
+              {% endif %}
+            {% endfor %}
+          </div>
+        {%- endcapture -%}
+      {% else %}
+          {%- capture tab_contents_html -%}
+            {{ tab_contents_html }}
+            <div class="tab-content tab-content-{{ count }}{% if count == 0 %} current{% endif %} rte">
+              {{ content }}
+            </div>
+          {%- endcapture -%}
+      {% endif %}
+
+      {%- assign count = count | plus: 1 -%}
+    {%- endif -%}
+  {%- endfor -%}
+
+  {%- if tab_contents_html -%}
+    <div class="product-tabs" data-tabs-holder>
+      <div class="tabs__head product-tabs__head">
+        <ul class="tabs product-tabs-title" data-scrollbar data-scrollbar-slider>
+          {{ tab_links_html }}
+        </ul>
+
+        <button type="button" class="tabs__arrow tabs__arrow--prev product-tabs__arrow product-tabs__arrow--prev is-hidden" data-scrollbar-arrow-prev>
+          {%- render 'icon-nav-arrow-left' -%}
+          <span class="visually-hidden">{{ 'products.general.see_all' | t }}</span>
+        </button>
+
+        <button type="button" class="tabs__arrow tabs__arrow--next product-tabs__arrow product-tabs__arrow--next is-hidden" data-scrollbar-arrow-next>
+          {%- render 'icon-nav-arrow-right' -%}
+          <span class="visually-hidden">{{ 'products.general.see_all' | t }}</span>
+        </button>
+      </div>
+
+      {{ tab_contents_html }}
+    </div>
+  {%- endif -%}
+{%- elsif block.settings.style == 'accordions' -%}
+  <collapsible-elements single="true">
+    <div class="product-accordion">
+      {%- assign accordion_blocks_html = '' -%}
+      {%- assign accordion_description_attr = '' -%}
+
+      {%- for i in (1..5) -%}
+        {%- liquid
+          assign title = 'title_' | append: forloop.index
+          assign title = block.settings[title]
+
+          assign content = 'raw_content_' | append: forloop.index
+          assign content = block.settings[content]
+
+          assign accordion_open = false
+          if product_description_content == blank and forloop.index == 1
+            assign accordion_open = true
+          endif
+        -%}
+
+        {%- if title != '' and content != '' -%}
+          {%- capture accordion_blocks_html -%}
+            {{ accordion_blocks_html }}
+
+            <details class="accordion" data-collapsible{% if accordion_open %} open="true"{% endif %}>
+              <summary class="accordion__title" data-collapsible-trigger {{ block.shopify_attributes }}>
+                {{ title }}
+
+                {%- render 'icon-plus' -%}
+                {%- render 'icon-minus' -%}
+              </summary>
+
+              <div class="accordion__body rte" data-collapsible-body{% if accordion_open %} style="height: auto;"{% endif %}>
+                <div class="accordion__content" data-collapsible-content>
+                  {{ content }}
+                </div>
+              </div>
+            </details>
+          {%- endcapture -%}
+        {%- endif -%}
+      {%- endfor -%}
+
+      {%- if product_description_content != blank -%}
+        <details class="accordion" data-collapsible open="true">
+          <summary class="accordion__title" data-collapsible-trigger {{ accordion_description_attr }}>
+            {{ 'products.general.description' | t }}
+
+            {%- render 'icon-plus' -%}
+            {%- render 'icon-minus' -%}
+          </summary>
+
+          <div class="accordion__body rte" data-collapsible-body style="height: auto;">
+            <div class="accordion__content accordion-content__holder accordion-content__holder--truncate" {{ truncated_holder }} data-collapsible-content>
+              <div class="accordion-content__inner">
+                <div class="accordion-content__entry" data-truncated-content="accordion-content__entry--truncate">
+                  {{ product_description_content }}
+                </div>
+              </div>
+              {%- if show_more_button -%}
+                <div class="accordion-content__actions">
+                  {{ truncate_html }}
+                </div>
+              {%- endif -%}
+            </div>
+          </div>
+        </details>
+      {%- endif -%}
+
+      {{ accordion_blocks_html }}
+    </div>
+  </collapsible-elements>
+{%- endif -%}

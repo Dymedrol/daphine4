@@ -1,0 +1,91 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "type": "footer",
+  "name": "Footer",
+  "sections": {
+    "footer": {
+      "type": "footer",
+      "blocks": {
+        "6061fdb0-c49a-471a-ad91-4f689b346f2c": {
+          "type": "linklist",
+          "settings": {
+            "linklist": "footer-menu-broadcast-information",
+            "title": "Information",
+            "column_width": 25
+          }
+        },
+        "footer-1": {
+          "type": "linklist",
+          "settings": {
+            "linklist": "footer-menu-broadcast",
+            "title": "Client Services",
+            "column_width": 25
+          }
+        },
+        "footer-2": {
+          "type": "text",
+          "disabled": true,
+          "settings": {
+            "image_width": 150,
+            "title": "Contact",
+            "text": "<p>14 Powis Mews </p><p>Notting Hill </p><p>London</p><p>W11 1JN</p>",
+            "column_width": 20
+          }
+        },
+        "footer-0": {
+          "type": "newsletter",
+          "settings": {
+            "title": "",
+            "text": "<h6>Receive 10% off your first order </h6><p>By signing up, you agree to our <a href=\"/pages/privacy-policy\" target=\"_blank\" title=\"PRIVACY POLICY\">Privacy & Policy *</a></p>",
+            "show_name": false,
+            "button_text": "Join",
+            "show_arrow": false,
+            "terms": false,
+            "button_type": "btn--black",
+            "button_size": "",
+            "button_style": "btn--outline",
+            "show_social_links": false,
+            "column_width": 50
+          }
+        }
+      },
+      "block_order": [
+        "6061fdb0-c49a-471a-ad91-4f689b346f2c",
+        "footer-1",
+        "footer-2",
+        "footer-0"
+      ],
+      "settings": {
+        "logo_image_width": 150,
+        "overlay_opacity": 100,
+        "overlay_color": "#f5f3ef",
+        "padding_top": 50,
+        "padding_bottom": 0
+      }
+    },
+    "supporting-menu": {
+      "type": "section-supporting-menu",
+      "settings": {
+        "linklist": "",
+        "footer_payment_enable": false,
+        "show_locale_selector": true,
+        "show_currency_selector": true,
+        "type": "currency",
+        "padding_top": 30,
+        "padding_bottom": 30
+      }
+    }
+  },
+  "order": [
+    "footer",
+    "supporting-menu"
+  ]
+}

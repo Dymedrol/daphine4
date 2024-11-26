@@ -1,0 +1,25 @@
+<!-- /sections/section-anchor.liquid -->
+
+<div id="{{ section.settings.anchor }}" class="section-anchor"></div>
+
+
+{% schema %}
+{
+  "name": "Anchor",
+  "settings": [
+    {
+      "label": "anchor",
+      "id": "anchor",
+      "type": "text"
+    }
+  ],
+  "presets": [
+    {
+      "name": "anchor "
+    }
+  ],
+  "disabled_on": {
+    "groups": ["header", "aside", "custom.pre_footer", "footer"]
+  }
+}
+{% endschema %}

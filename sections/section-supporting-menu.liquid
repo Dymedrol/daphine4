@@ -1,0 +1,193 @@
+<!-- /sections/section-supporting-menu.liquid -->
+
+{%- liquid
+  assign languages = false
+  assign currencies = false
+
+  if section.settings.show_locale_selector and shop.published_locales.size > 1
+    assign languages = true
+  endif
+
+  if section.settings.show_currency_selector and shop.enabled_currencies.size > 1
+    assign currencies = true
+  endif
+-%}
+
+{%- style -%}
+  #SupportingMenu--{{ section.id }} {
+    --PT: {{ section.settings.padding_top }}px;
+    --PB: {{ section.settings.padding_bottom }}px;
+  }
+{%- endstyle -%}
+
+<section id="SupportingMenu--{{ section.id }}"
+  class="supporting-menu section-padding"
+  data-section-id="{{ section.id }}"
+  data-section-type="supporting-menu"
+>
+  <div class="supporting-menu__inner wrapper--full-padded">
+    {%- if languages or currencies -%}
+      <div class="supporting-menu__item supporting-menu__item--localization hidden">
+        {%- render 'localization' section: section, class: 'footer', show_icon: true -%}
+      </div>
+    {%- endif -%}
+
+    <div class="supporting-menu__item supporting-menu__item--localization">
+      <div class="international international-footer">
+        <div class="international-text-wrapper">
+          <span class="international-text">{% if canonical_url contains 'en-us' %}INTERNATIONAL{% else %}UNITED&#160;KINGDOM{% endif %}</span>
+          <svg aria-hidden="true" focusable="false" role="presentation" class="icon icon-arrow-right" width="25" height="44" viewBox="0 0 25 44" fill="#000000" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22.0921 22.707L2.29312 42.506L3.70733 43.9202L24.9205 22.707L2.29312 0.0795898L0.878906 1.4938L22.0921 22.707Z" fill="black"></path>
+          </svg>
+        </div>
+        <div class="international-details" tabindex="-1">
+          <a href="https://www.shop-daphine.com" class="international-details__link {% unless canonical_url contains 'en-us' %}international-details__link_active{% endunless %}">United&#160;Kingdom</a>
+          <a href="https://eu.shop-daphine.com" class="international-details__link">Europe</a>
+          <a href="https://www.shop-daphine.com/en-us" class="international-details__link {% if canonical_url contains 'en-us' %}international-details__link_active{% endif %}">International</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="supporting-menu__item supporting-menu__item--copyright">
+      <ul class="supporting-menu__copyright inline-list">
+        <li>
+          <a href="{{ shop.secure_url }}">&copy; {{ shop.name }} {{ 'now' | date: "%Y" }}</a>
+        </li>
+        {% for link in linklists[section.settings.linklist].links %}
+          <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+        {% endfor %}
+
+        <!-- The following lines fix Lighthouse security warnings on the Shopify link.-->
+        {%- liquid
+          assign powered_by_link_html = powered_by_link
+          if powered_by_link_html contains 'rel="'
+            assign powered_link_rel_text = powered_by_link_html | split: 'rel="'
+            assign powered_link_rel_text = powered_link_rel_text[1] | split: '"' | first
+            assign powered_link_rel = 'rel="' | append: powered_link_rel_text | append: '"'
+            assign powered_by_link_html = powered_by_link_html | replace_first: powered_link_rel, ''
+          endif
+          if powered_by_link_html contains '<a '
+            assign powered_by_link_html = powered_by_link_html | replace: '<a ', '<a rel="noopener" '
+          endif
+          assign powered_by_link = powered_by_link_html
+        -%}
+
+        <!-- Remove the following line to delete 'Powered by Shopify' from your footer
+        <li data-powered-link>{{ powered_by_link }}</li>
+        Do not delete below this line -->
+      </ul>
+    </div>
+
+    <!-- HC - social menu - 02 Aug '23 -->
+    <div class="supporting-menu__item">
+      {%- render 'social-icons' -%}
+    </div>
+
+    {%- if section.settings.footer_payment_enable -%}
+      {%- unless shop.enabled_payment_types == empty -%}
+        <div class="supporting-menu__item supporting-menu__item--payment">
+          <ul class="supporting-menu__payment payment-icons inline-list">
+            {%- for type in shop.enabled_payment_types -%}
+              <li>{{ type | payment_type_svg_tag: class: 'payment-icon' }}</li>
+            {%- endfor -%}
+          </ul>
+        </div>
+      {%- endunless -%}
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Supporting menu",
+  "limit": 1,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Bottom bar"
+    },
+    {
+      "type": "link_list",
+      "id": "linklist",
+      "label": "Link List",
+      "info": "This menu won't show dropdown items."
+    },
+    {
+      "type": "checkbox",
+      "id": "footer_payment_enable",
+      "label": "Show payment types",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "language selector",
+      "info": "To add a language, go to your [language settings.](/admin/settings/languages)"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_locale_selector",
+      "label": "Show language selector",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Currency selector",
+      "info": "To add a currency, go to your [payment settings.](/admin/settings/payments)"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_currency_selector",
+      "label": "Show currency selector",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "type",
+      "label": "Type",
+      "options": [
+        {
+          "value": "currency",
+          "label": "Currency"
+        },
+        {
+          "value": "country",
+          "label": "Country"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Section padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 30
+    }
+  ],
+  "presets": [
+    {
+      "name": "Supporting menu",
+      "category": "Text"
+    }
+  ],
+  "enabled_on": {
+    "groups": ["footer"]
+  }
+}
+{% endschema %}

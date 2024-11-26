@@ -1,0 +1,120 @@
+<div data-api-content>
+  {%- if cart.item_count > 0 -%}
+    <span class="visually-hidden" aria-live="polite">
+      {{- 'cart.general.add_message' | t -}} "{{- cart.items[0].title -}}" {{ 'cart.general.total_message' | t: count: cart.item_count }}
+    </span>
+
+    <div data-api-line-items>
+      {%- render 'cart-line-items', part: 'line-items' -%}
+    </div>
+    <div data-api-upsell-items>
+      {%- render 'cart-line-items', part: 'upsell-items' -%}
+    </div>
+  {%- else -%}
+    {% comment %}
+      The cart is empty
+    {% endcomment %}
+    <div class="text-center">
+      <p>{{ 'cart.general.empty' | t }}</p>
+      <p><a href="{{ routes.root_url }}" class="btn btn--primary btn--solid">{{ 'cart.general.continue_shopping' | t }}</a></p>
+    </div>
+  {%- endif -%}
+
+  <div data-api-cart-price>
+    {%- liquid
+  assign subtotal = cart.total_price | plus: 0
+  assign cart_discount_size = cart.cart_level_discount_applications.size
+  assign original_subtotal = cart.original_total_price | plus: 0
+  assign currency_code_enable = settings.currency_code_enable
+
+  if currency_code_enable
+    assign original_subtotal_formatted = original_subtotal | money_with_currency
+  else
+    assign original_subtotal_formatted = original_subtotal | money
+  endif
+
+  if original_subtotal < subtotal or cart_discount_size == 0
+    assign cart_total_hidden = true
+  endif
+
+  if cart_discount_size == 0
+    assign cart_total_discount_hidden = true
+  endif
+-%}
+
+<div class="cart__total{% if cart_total_hidden %} is-hidden{% endif %}"
+  {% unless cart_total_hidden %}
+    data-animation="{{ animation_name }}"
+    data-animation-duration="{{ animation_duration }}"
+    data-animation-delay="{{ animation_delay }}"
+    {%- assign animation_delay = animation_delay | plus: animation_delay_increment -%}
+  {% endunless %}
+>
+  <span class="cart__total__label">{{ 'cart.general.subtotal_items' | t }}</span>
+
+  <span class="cart__total__price">
+    {%- if original_subtotal == 0 -%}
+      {{ 'general.money.free' | t }}
+    {%- else -%}
+      {{- original_subtotal_formatted -}}
+    {%- endif -%}
+  </span>
+</div>
+
+<div class="cart__total__discount{% if cart_total_discount_hidden %} is-hidden{% endif %}"
+  {% unless cart_total_discount_hidden %}
+    data-animation="{{ animation_name }}"
+    data-animation-duration="{{ animation_duration }}"
+    data-animation-delay="{{ animation_delay }}"
+    {% if cart_discount_size > 0 %}
+      {%- assign animation_delay = animation_delay | plus: animation_delay_increment -%}
+    {% endif %}
+  {% endunless %}
+>
+  {%- if cart.cart_level_discount_applications.size > 0 -%}
+    {%- for discount in cart.cart_level_discount_applications -%}
+      {%- liquid
+        if currency_code_enable
+          assign discount_total_allocated_amount = discount.total_allocated_amount | money_with_currency
+        else
+          assign discount_total_allocated_amount = discount.total_allocated_amount | money
+        endif
+      -%}
+
+      <div class="cart__total">
+        <div>
+          {%- render 'icon-tags' -%}
+
+          <span>
+            {{- discount.title -}}
+          </span>
+        </div>
+
+        <span>
+          -{{- discount_total_allocated_amount -}}
+        </span>
+      </div>
+    {%- endfor -%}
+  {%- endif -%}
+</div>
+
+<div class="cart__total"
+  data-animation="{{ animation_name }}"
+  data-animation-duration="{{ animation_duration }}"
+  data-animation-delay="{{ animation_delay }}"
+  {%- assign animation_delay = animation_delay | plus: animation_delay_increment -%}
+>
+  <span class="cart__total__label">{{- 'cart.general.subtotal' | t -}}</span>
+
+  <span class="cart__total__price cart__total__price--animated" data-cart-total="{{ subtotal }}">
+    {%- if subtotal == 0 -%}
+      {{ 'general.money.free' | t }}
+    {%- else -%}
+      {{- subtotal | money_with_currency -}}
+    {%- endif -%}
+  </span>
+
+  <div class="cart__price__loader loader"><div class="loader-indeterminate"></div></div>
+</div>
+  </div>
+</div>

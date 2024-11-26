@@ -1,0 +1,58 @@
+{% comment %}
+  /snippets/media.liquid
+
+  Returns a media object for a product slideshow
+  Accepts:
+  -  media: {Object} - The media object we will use (required)
+  -  product: {Object} - The current product (required)
+  -  sectionkey: {String} - A section key for use in the media object js
+  -  image_width: {Number} - Image width on desktop based on the setting
+
+  Usage:
+  {% render 'media', media: media, featured_media: featured_media, enable_video_looping: enable_video_looping, sectionkey: section.id  %}
+{% endcomment %}
+{%- liquid
+  assign image_size = '1024x1024'
+  assign media_aspect_ratio = media.aspect_ratio
+  unless media_aspect_ratio
+    assign media_aspect_ratio = 1
+  endunless
+  assign media_padding_top = 1 | divided_by: media_aspect_ratio | times: 100 | round: 2
+
+  capture image
+    assign loading = loading | default: 'lazy'
+    assign preload = nil
+    assign fetchpriority = nil
+    assign attributes = nil
+    assign cover = cover | default: false
+
+    if template.name == 'product' and media == featured_media
+      assign loading = 'eager'
+      assign fetchpriority = 'high'
+    endif
+
+    if media.alt contains 'variant--'
+      assign attributes = 'data-variant="' | append: media.alt | append: '"'
+    endif
+
+    assign image_sizes = '(min-width: 1400px) ' | append: image_width | append: 'px, (min-width: 750px) calc((50vw - 30px) / 2), calc(100vw - 32px)'
+
+    render 'image' image: media.preview_image, sizes: image_sizes, loading: eager, fetchpriority: fetchpriority, preload: preload, attributes: attributes, aspect_ratio: media_aspect_ratio, cover: cover
+
+  endcapture
+-%}
+
+<div
+  data-image-id="{{ data-image-id }}"
+  class="new-product-slider__slide{% if data-image-id == 1 %} new-product-slider__slide_active{% endif %}"
+>
+
+  {%- case media.media_type -%}
+    {%- when 'image' -%}
+      <div class="new-product-slider__slide__photo"
+        tabindex="0"
+        style="--aspect-ratio: {{ media_aspect_ratio }}">
+        {{ image }}
+      </div>
+  {%- endcase -%}
+</div>

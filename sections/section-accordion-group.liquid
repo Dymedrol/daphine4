@@ -1,0 +1,241 @@
+<!-- /sections/section-accordion-group.liquid -->
+{%- liquid
+  assign bg_color = section.settings.bg_color
+  assign text_color = section.settings.color
+  assign border_color = section.settings.border_color
+-%}
+
+{%- style -%}
+  #AccordionGroup--{{ section.id }} {
+    --PT: {{ section.settings.padding_top }}px;
+    --PB: {{ section.settings.padding_bottom }}px;
+
+    {%- unless bg_color == 'rgba(0,0,0,0)' or bg_color == blank -%}
+      --bg: {{ bg_color }};
+    {%- endunless -%}
+
+    {%- unless text_color == 'rgba(0,0,0,0)' or text_color == blank -%}
+      --text: {{ text_color }};
+    {%- endunless -%}
+
+    {%- unless border_color == 'rgba(0,0,0,0)' or border_color == blank -%}
+      --border: {{ border_color }};
+    {%- endunless -%}
+  }
+{%- endstyle -%}
+
+<div id="AccordionGroup--{{ section.id }}" class="accordion-group section-padding">
+  {%- if section.blocks.size > 0 -%}
+    <div class="faq {{ section.settings.width }}"
+      data-section-id="{{ section.id }}"
+      data-section-type="faq"
+    >
+      <collapsible-elements single="true">
+        {%- for block in section.blocks -%}
+          {%- assign current_block = block.settings -%}
+
+          {%- if block.type == 'heading' and current_block.title != blank -%}
+            {%- assign font_size_class = block.settings.heading_size | prepend: 'heading-size-' -%}
+            {%- assign mobile_font_size_class = section.settings.mobile_heading_size | prepend: 'mobile-heading-size-' -%}
+            <h3 class="faq__title h4 {{ font_size_class }} {{ mobile_font_size_class }}" {{ block.shopify_attributes }}>{{ current_block.title }}</h3>
+          {%- endif -%}
+
+          {%- if block.type == 'question' and current_block.title != blank and current_block.content != blank -%}
+            {%- if current_block.title != blank -%}
+              <details class="accordion" data-collapsible {{ block.shopify_attributes }}>
+                {%- assign font_size_class = block.settings.heading_size | prepend: 'heading-size-' -%}
+                {%- assign mobile_font_size_class = section.settings.mobile_heading_size | prepend: 'mobile-heading-size-' -%}
+
+                <summary class="accordion__title h6 {{ font_size_class }} {{ mobile_font_size_class }}" data-collapsible-trigger>
+                  {{ current_block.title }}
+
+                  {%- render 'icon-plus' -%}
+                  {%- render 'icon-minus' -%}
+                </summary>
+
+                <div class="accordion__body rte" data-collapsible-body>
+                  {%- assign font_size_class = block.settings.text_size | prepend: 'body-size-' -%}
+                  {%- assign mobile_font_size_class = block.settings.mobile_text_size | prepend: 'mobile-body-size-' -%}
+                  <div class="accordion__content {{ font_size_class }} {{ mobile_font_size_class }}" data-collapsible-content>
+                    {{ current_block.content }}
+                  </div>
+                </div>
+              </details>
+            {%- endif -%}
+          {%- endif -%}
+        {%- endfor -%}
+      </collapsible-elements>
+    </div>
+  {%- endif -%}
+</div>
+
+{% schema %}
+  {
+    "name": "Accordion group",
+    "settings": [
+      {
+        "type": "select",
+        "id": "width",
+        "label": "Width",
+        "default": "wrapper--narrow",
+        "options": [
+          {"value": "wrapper", "label": "Normal"},
+          {"value": "wrapper--narrow", "label": "Narrow"}
+        ]
+      },
+      {
+        "type": "header",
+        "content": "Colors"
+      },
+      {
+        "type": "color",
+        "id": "bg_color",
+        "label": "Background"
+      },
+      {
+        "type": "color",
+        "id": "color",
+        "label": "Text"
+      },
+      {
+        "type": "color",
+        "id": "border_color",
+        "label": "Border"
+      },
+      {
+        "type": "header",
+        "content": "Section padding"
+      },
+      {
+        "type": "range",
+        "id": "padding_top",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "label": "Padding top",
+        "default": 50
+      },
+      {
+        "type": "range",
+        "id": "padding_bottom",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "label": "Padding bottom",
+        "default": 50
+      }
+    ],
+    "blocks": [
+      {
+        "name": "Heading",
+        "type": "heading",
+        "settings": [
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Heading",
+            "default": "FAQ"
+          },
+          {
+            "type": "range",
+            "id": "heading_size",
+            "label": "Heading size",
+            "min": 1,
+            "max": 15,
+            "step": 1,
+            "default": 5
+          },
+          {
+            "type": "range",
+            "id": "mobile_heading_size",
+            "label": "Mobile heading size",
+            "min": 1,
+            "max": 15,
+            "step": 1,
+            "default": 5
+          }
+        ]
+      },
+      {
+        "name": "Question",
+        "type": "question",
+        "settings": [
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Question",
+            "info": "Block will not be visible if left empty.",
+            "default": "Frequently asked question"
+          },
+          {
+            "type": "range",
+            "id": "heading_size",
+            "label": "Heading size",
+            "min": 1,
+            "max": 15,
+            "step": 1,
+            "default": 5
+          },
+          {
+            "type": "range",
+            "id": "mobile_heading_size",
+            "label": "Mobile heading size",
+            "min": 1,
+            "max": 15,
+            "step": 1,
+            "default": 5
+          },
+          {
+            "type": "richtext",
+            "id": "content",
+            "label": "Answer",
+            "default": "<p>Share details about your shipping policies, item returns, or customer service.<\/p>"
+          },
+          {
+            "type": "range",
+            "id": "text_size",
+            "label": "Text size",
+            "min": 1,
+            "max": 15,
+            "step": 1,
+            "default": 3
+          },
+          {
+            "type": "range",
+            "id": "mobile_text_size",
+            "label": "Mobile text size",
+            "min": 1,
+            "max": 15,
+            "step": 1,
+            "default": 3
+          }
+        ]
+      }
+    ],
+    "presets": [
+      {
+        "name": "Accordion group",
+        "category": "Text",
+        "blocks": [
+          {
+            "type": "heading"
+          },
+          {
+            "type": "question"
+          },
+          {
+            "type": "question"
+          },
+          {
+            "type": "question"
+          }
+        ]
+      }
+    ],
+    "disabled_on": {
+      "groups": ["header", "aside", "custom.pre_footer", "footer"]
+    }
+  }
+{% endschema %}

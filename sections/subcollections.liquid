@@ -1,0 +1,200 @@
+{%- liquid
+  assign text_color = section.settings.color
+  assign bg_color = section.settings.bg_color
+  assign sub_collections = linklists[collection.handle].links
+  assign sub_collection_html = ''
+  assign sub_collection_counter = 0
+  assign sub_collection_limit = 6
+-%}
+{%- if linklists[collection.handle].links.size > 0 -%}
+  {%- style -%}
+    #Subcollections--{{ section.id }} {
+      --PT: {{ section.settings.padding_top }}px;
+      --PB: {{ section.settings.padding_bottom }}px;
+
+      {%- unless text_color == 'rgba(0,0,0,0)' or text_color == blank -%}
+        --text: {{ text_color }};
+      {%- endunless -%}
+
+      {%- unless bg_color == 'rgba(0,0,0,0)' or bg_color == blank -%}
+        --bg: {{ bg_color }};
+      {%- endunless -%}
+    }
+  {%- endstyle -%}
+
+  <section class="subcollections collection-{{ collection.handle }} section-padding"
+    id="Subcollections--{{ section.id }}"
+    data-section-id="{{ section.id }}"
+    data-section-type="collection">
+    {%- if sub_collections.size > 0 -%}
+      {%- for sublink in sub_collections -%}
+        {%- liquid
+          if sublink.type != 'collection_link' or sublink.object.handle == blank
+            continue
+          endif
+
+          assign sub_collection_handle = sublink.object.handle
+          assign sub_collection_handle_separator = sub_collection_handle | append: ',' | prepend: ','
+          assign sub_collection = collections[sub_collection_handle]
+
+          if sublink.object.handle contains sub_collection_handle_separator
+            continue
+          endif
+        -%}
+
+        {%- capture sub_collection_html -%}
+          {{ sub_collection_html }}
+
+          <div class="grid-item subcollection__item" data-slide="{{ forloop.index0 }}" data-slide-index="{{ forloop.index0 }}">
+            <div class="subcollection__inner">
+              <a class="subcollection__link" href="{{ sub_collection.url }}">
+                <div class="subcollection__image">
+                  {%- assign image = sub_collection.image -%}
+
+                  {%- if section.settings.select_image == 'product' or image == blank -%}
+                    {%- assign image = sub_collection.products.first.featured_media.preview_image -%}
+                  {%- endif -%}
+
+                  {%- capture sizes -%}
+                    (min-width: 750px) (calc(100vw - 16px) / 3), calc(100vw - 32px)
+                  {%- endcapture -%}
+
+                  {%- render 'image' image: image, sizes: sizes, cover: true -%}
+                </div>
+                <div class="image-overlay-bottom"></div>
+                <div class="subcollection__text">
+                  <p class="subcollection__title h5">{{ sub_collection.title }}</p>
+                  {%- if sub_collection.description != '' and section.settings.subcollection_description -%}
+                    <div class="subcollection__description">{{ sub_collection.description }}</div>
+                  {%- endif -%}
+                </div>
+              </a>
+            </div>
+          </div>
+        {%- endcapture -%}
+
+        {%- assign sub_collection_counter = sub_collection_counter | plus: 1 -%}
+
+        {%- if sub_collection_counter >= sub_collection_limit -%}
+          {%- break -%}
+        {%- endif -%}
+      {%- endfor -%}
+
+      {%- if sub_collection_html != '' -%}
+        {%- liquid
+          assign layout_slider = false
+          if section.settings.subcollection_layout == 'carousel' and sub_collection_counter > 4
+            assign layout_slider = true
+          endif
+
+          assign columns_desktop = sub_collection_counter | at_most: 4
+          assign columns_medium = 3
+
+          if columns_desktop == 2 or columns_desktop == 4
+            assign columns_medium = 2
+          endif
+        -%}
+
+        <div class="grid-outer">
+          <div class="grid{% if layout_slider %} grid--slider{% endif %} grid--mobile-slider"
+            style="--COLUMNS: {{ columns_desktop }}; --COLUMNS-MEDIUM: {{ columns_medium }};"
+            {% if layout_slider %}
+              data-slider="Slider--{{ section.id }}"
+              data-options='{"watchCSS": true, "cellAlign": "left", "pageDots": false, "prevNextButtons": true, "wrapAround": false, "groupCells": true}'
+            {% endif %}>
+            {{ sub_collection_html }}
+          </div>
+        </div>
+      {%- endif -%}
+    {%- endif -%}
+  </section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Subcollections",
+  "templates": ["collection"],
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Create a [navigation list](/admin/menus) with the same name as this collection and link to other collections. [Learn more](https://invisiblethemes.com/link/broadcast/docs/subcollection)"
+    },
+    {
+      "type": "select",
+      "id": "subcollection_layout",
+      "label": "Layout",
+      "options": [
+        {
+          "value": "grid",
+          "label": "Grid"
+        },
+        {
+          "value": "carousel",
+          "label": "Carousel"
+        }
+      ],
+      "default": "grid"
+    },
+    {
+      "type": "checkbox",
+      "id": "subcollection_description",
+      "label": "Show description",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "select_image",
+      "label": "Select a photo to display",
+      "options": [
+        {
+          "value": "collection",
+          "label": "Collection image"
+        },
+        {
+          "value": "product",
+          "label": "Product image"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "color",
+      "label": "Text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background"
+    },
+    {
+      "type": "header",
+      "content": "Section padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 20
+    }
+  ]
+}
+{% endschema %}

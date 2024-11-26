@@ -1,0 +1,504 @@
+<!-- /sections/footer.liquid -->
+
+{%- liquid
+  assign blocks_size = section.blocks.size
+  assign image_background = section.settings.image
+  assign logo = section.settings.logo
+
+  assign one_third_blocks_only = false
+  assign one_third_block_count = 0
+  for block in section.blocks
+    if block.settings.column_width == 33
+      assign one_third_block_count = one_third_block_count | plus: 1
+    endif
+  endfor
+
+  if one_third_block_count == blocks_size
+    assign one_third_blocks_only = true
+  endif
+-%}
+
+{%- style -%}
+  .site-footer-wrapper {
+    --PT: {{ section.settings.padding_top }}px;
+    --PB: {{ section.settings.padding_bottom }}px;
+    --item-count: {{ blocks_size }};
+  }
+
+  {% if image_background %}
+    .footer-group { background: none; }
+    .footer-group .footer__image { background-color: var(--bg); }
+
+    .footer-sections [data-section-type] {
+      position: relative;
+      z-index: 1;
+    }
+  {% endif %}
+{%- endstyle -%}
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+            const closeIcon = document.querySelector('.geoip-close-icon');
+            const geoipLink = document.querySelector('.geoip-rule-link');
+            if (closeIcon && geoipLink) {
+                const geoipUrl = geoipLink.getAttribute('href');
+                closeIcon.addEventListener('click', function(event) {
+                    event.stopPropagation();
+                    event.preventDefault();
+                    window.location.href = geoipUrl;
+                }, true); // The true parameter makes this a capture event listener, which runs before others
+            }
+        }, 2000); // 1000 milliseconds = 1 second
+    });
+</script>
+
+
+
+<section class="site-footer-wrapper section-padding" data-section-id="{{ section.id }}" data-section-type="footer">
+  <div class="site-footer wrapper--full-padded">
+    {%- if logo -%}
+      <div class="footer__logo__wrapper">
+        <a href="{{ routes.root_url }}" class="footer__logo" style="width: {{ section.settings.logo_image_width }}px;">
+          {%- render 'image' image: logo, sizes: '(min-width: 1400px) calc(100vw - 100px), (min-width: 750px) calc(100vw - 50px), calc(100vw - 32px)' -%}
+        </a>
+      </div>
+    {%- endif -%}
+
+    {%- if section.blocks.size > 0 -%}
+      <div class="footer__blocks">
+        {%- for block in section.blocks -%}
+          {%- liquid
+            assign title = block.settings.title
+            assign text = block.settings.text
+            assign show_social_links = block.settings.show_social_links
+            assign column_width = block.settings.column_width
+            if one_third_blocks_only
+              assign column_width = 33.333333
+            endif
+
+            capture block_style
+              echo '--desktop-width: ' | append: column_width | append: '%'
+            endcapture
+          -%}
+
+          {%- case block.type -%}
+            {%- when 'linklist' -%}
+              {%- assign linklist = linklists[block.settings.linklist] -%}
+              {%- assign linklist_title = title | default: linklist.title -%}
+              <div class="footer__block footer__block--menu" style="{{ block_style }}" {{ block.shopify_attributes }}>
+                {%- if linklist_title != blank -%}
+                  <h2 class="h5 footer__block__title">{{ linklist_title | escape }}</h2>
+                {%- endif -%}
+
+                {%- if linklist != blank -%}
+                  <ul class="footer__quicklinks unstyled">
+                    {%- for link in linklist.links -%}
+                      <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+                    {%- endfor -%}
+                  </ul>
+                {%- endif -%}
+              </div>
+
+            {%- when 'page' -%}
+              {%- assign page = pages[block.settings.page] -%}
+              {%- if page == blank or page.empty? -%}
+                <div class="footer__block footer__block--page" style="{{ block_style }}" {{ block.shopify_attributes }}>
+                  <h2 class="h5 footer__block__title">{{ shop.name }}</h2>
+                  <div class="rte">{{ 'home_page.onboarding.no_content' | t }}</div>
+                </div>
+              {%- else -%}
+                <div class="footer__block footer__block--page" style="{{ block_style }}" {{ block.shopify_attributes }}>
+                  <h2 class="h5 footer__block__title">{{ page.title | escape }}</h2>
+                  <div class="rte">{{ page.content }}</div>
+                </div>
+              {%- endif -%}
+
+            {%- when 'social' -%}
+              <div class="footer__block footer__block--social" style="{{ block_style }}" {{ block.shopify_attributes }}>
+                {%- if title != blank -%}
+                  <h2 class="h5 footer__block__title">{{ title | escape }}</h2>
+                {%- endif -%}
+
+                {%- if text != blank -%}
+                  <div class="rte footer__social__text">{{ text }}</div>
+                {%- endif -%}
+
+                {%- render 'social-icons' -%}
+              </div>
+
+            {%- when 'text' -%}
+              <div class="footer__block footer__block--text" style="{{ block_style }}" {{ block.shopify_attributes }}>
+                {%- if block.settings.image -%}
+                  <div class="footer__block__image" style="width: {{ block.settings.image_width }}px;">
+                    {%- render 'image' image: block.settings.image -%}
+                  </div>
+                {%- endif -%}
+
+                {%- if title != blank -%}
+                  <h2 class="h5 footer__block__title">{{ title | escape }}</h2>
+                {%- endif -%}
+
+                {%- if text != blank -%}
+                  <div class="rte">{{ text }}</div>
+                {%- endif -%}
+              </div>
+
+            {%- when 'newsletter' -%}
+              <div class="footer__block footer__block--newsletter" style="{{ block_style }}" {{ block.shopify_attributes }}>
+                <div class="footer__newsletter__wrapper">
+                  {%- if title != blank -%}
+                    <h2 class="h5 footer__block__title">{{ title }}</h2>
+                  {%- endif -%}
+
+                  {%- if text != blank -%}
+                    <div class="rte footer__newsletter__text">{{ text }}</div>
+                  {%- endif -%}
+
+                  {%- render 'newsletter-form' block: block, footer: true -%}
+
+                  {%- if show_social_links -%}
+                    {%- render 'social-icons' modifier: 'socials--newsletter' -%}
+                  {%- endif -%}
+                </div>
+              </div>
+          {%- endcase -%}
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{%- comment -%} Section background image {%- endcomment -%}
+{%- if image_background -%}
+  <div class="footer__image">
+    {%- assign sizes = '(min-width: 990px) calc(100vw - 100px), (min-width: 750px) calc(100vw - 60px), calc(100vw - 32px)' -%}
+    {%- render 'image' image: image_background, sizes: sizes, cover: true -%}
+    {%- assign overlay_opacity = section.settings.overlay_opacity | times: 0.01 -%}
+    <div class="image-overlay" style="--bg: {{ section.settings.overlay_color }}; --overlay-opacity: {{ overlay_opacity }};"></div>
+  </div>
+{%- endif -%}
+
+{% javascript %}
+  const firstSectionImage = document.querySelector('.main-content > .shopify-section img');
+  if (firstSectionImage) {
+    firstSectionImage.setAttribute('loading', 'eager');
+    firstSectionImage.setAttribute('fetchpriority', 'high');
+  }
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Footer",
+  "max_blocks": 5,
+  "settings": [
+    {
+      "label": "Logo",
+      "type": "image_picker",
+      "id": "logo"
+    },
+    {
+      "type": "range",
+      "id": "logo_image_width",
+      "label": "Logo width (in pixels)",
+      "min": 50,
+      "max": 400,
+      "step": 5,
+      "unit": "px",
+      "default": 150
+    },
+    {
+      "type": "header",
+      "content": "Optional background image"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Opacity",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 75
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "Overlay color",
+      "default": "#fff"
+    },
+    {
+      "type": "header",
+      "content": "Section padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 75
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 30
+    }
+  ],
+  "blocks" : [
+    {
+      "type": "linklist",
+      "name": "Link list",
+      "settings": [
+        {
+          "type": "link_list",
+          "id": "linklist",
+          "label": "Link list",
+          "default": "footer",
+          "info": "This menu won't show dropdown items."
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title"
+        },
+        {
+          "type": "range",
+          "id": "column_width",
+          "label": "Column width",
+          "unit": "%",
+          "min": 1,
+          "max": 100,
+          "step": 1,
+          "default": 33,
+          "info": "Desktop only"
+        }
+      ]
+    },
+    {
+      "type": "newsletter",
+      "name": "Newsletter",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Subscribers are under 'Accepts Marketing' in your [customer admin](/admin/customers)."
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "Newsletter"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "<p>Subscribe to get special offers, free giveaways, and once-in-a-lifetime deals.</p>"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_name",
+          "label": "Show name field",
+          "default": false
+        },
+        {
+          "type": "text",
+          "id": "button_text",
+          "label": "Button text",
+          "default": "Join"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_arrow",
+          "label": "Show arrow",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "terms",
+          "label": "Show reCAPTCHA terms",
+          "default": true,
+          "info": "Recommended if your online store preferences have spam protection enabled."
+        },
+        {
+          "type": "header",
+          "content": "Button",
+          "info": "Applies if \"Show name field\" is enabled."
+        },
+        {
+          "type": "select",
+          "id": "button_type",
+          "label": "Color",
+          "default": "btn--black",
+          "info": "Full width button only",
+          "options": [
+            {"value": "btn--primary", "label": "Primary"},
+            {"value": "btn--secondary", "label": "Secondary"},
+            {"value": "btn--white", "label": "White"},
+            {"value": "btn--black", "label": "Black"}
+          ]
+        },
+        {
+          "type": "select",
+          "id": "button_size",
+          "label": "Size",
+          "default": "",
+          "options": [
+            { "label": "Small", "value": "btn--small" },
+            { "label": "Medium", "value": "" },
+            { "label": "Large", "value": "btn--large" }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "button_style",
+          "label": "Style",
+          "default": "btn--solid",
+          "options": [
+            { "label": "Solid", "value": "btn--solid" },
+            { "label": "Outline", "value": "btn--outline" },
+            { "label": "Text", "value": "btn--text" }
+          ]
+        },
+        {
+          "type": "header",
+          "content": "Social media icons"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_social_links",
+          "label": "Show social icons",
+          "info": "Edit your social settings and accounts in [Theme settings](/admin/themes/current/editor?context=theme)",
+          "default": false
+        },
+        {
+          "type": "range",
+          "id": "column_width",
+          "label": "Column width",
+          "unit": "%",
+          "min": 1,
+          "max": 100,
+          "step": 1,
+          "default": 33,
+          "info": "Desktop only"
+        }
+      ]
+    },
+    {
+      "type": "social",
+      "name": "Social",
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Edit your social settings and accounts in [Theme settings](/admin/themes/current/editor?context=theme)"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "Social"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text"
+        },
+        {
+          "type": "range",
+          "id": "column_width",
+          "label": "Column width",
+          "unit": "%",
+          "min": 1,
+          "max": 100,
+          "step": 1,
+          "default": 33,
+          "info": "Desktop only"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Text",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "range",
+          "id": "image_width",
+          "label": "Image width (in pixels)",
+          "min": 50,
+          "max": 400,
+          "step": 5,
+          "unit": "px",
+          "default": 150
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "Text"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "<p>Share store details, promotions, or brand content with your customers.</p>"
+        },
+        {
+          "type": "range",
+          "id": "column_width",
+          "label": "Column width",
+          "unit": "%",
+          "min": 1,
+          "max": 100,
+          "step": 1,
+          "default": 33,
+          "info": "Desktop only"
+        }
+      ]
+    },
+    {
+      "type": "page",
+      "name": "Page",
+      "settings": [
+        {
+          "id": "page",
+          "type": "page",
+          "label": "Page"
+        },
+        {
+          "type": "range",
+          "id": "column_width",
+          "label": "Column width",
+          "unit": "%",
+          "min": 1,
+          "max": 100,
+          "step": 1,
+          "default": 33,
+          "info": "Desktop only"
+        }
+      ]
+    }
+  ],
+  "enabled_on": {
+    "groups": ["footer"]
+  }
+}
+{% endschema %}
